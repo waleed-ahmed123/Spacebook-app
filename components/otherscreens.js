@@ -1,10 +1,11 @@
-
 import React, { Component } from 'react';
+import { View, Text, Button, TextInput } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import HomeScreen from './home';
 import FriendRequestScreen from './friendRequest';
+import MyFriendsScreen from './myfriends';
 import UpdateProfileScreen from './updateProfile';
 
 const Tab = createBottomTabNavigator();
@@ -35,10 +36,12 @@ class OtherScreens extends Component{
     render(){
         return (
             <Tab.Navigator>
-                <Tab.Screen name="Home" component={HomeScreen} />
+                <Tab.Screen name="Home" component={HomeScreen}/>
                 <Tab.Screen name="FriendRequest" component={FriendRequestScreen} />
+                <Tab.Screen name="MyFriends" component={MyFriendsScreen} />
                 <Tab.Screen name="UpdateProfile" component={UpdateProfileScreen} />
             </Tab.Navigator>
+            
         );
     }
     
