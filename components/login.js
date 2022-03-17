@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TextInput } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const storeData = async (value) => {
@@ -20,7 +20,10 @@ class LoginScreen extends Component {
             email: "waleed.ahmed2@mmu.ac.uk",
             password: "waleed123",
             error: false,
-            message: ""
+            emailMessage: "",
+            passwordMessage: "",
+            isValidUser: true,
+            isValidPassword: true
         };
     }
 
@@ -32,8 +35,6 @@ class LoginScreen extends Component {
         // 3. if email and password are both valid... do the function
 
         //4. Else, display some error to the user
-        
-
         fetch('http://localhost:3333/api/1.0.0/login', {
             method: 'POST',
             headers: {
@@ -68,6 +69,56 @@ class LoginScreen extends Component {
             });
     }
 
+    handle_Valid_Password = () => {
+        console.log("handlePassword")
+        if(this.state.password.length > 4){
+            this.setState({
+                isValidPassword: true
+            })
+            return true;
+        } else{
+            this.setState({
+                isValidPassword: false,
+                passwordMessage: "Password must be greater than 4 characters"
+            })
+            return false;
+        }
+    }
+
+    handle_Valid_User = () => {
+        console.log("handleUser")
+        const regex = /^([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$)$/;
+        if (!this.state.email.length > 0) {
+            this.setState({
+                isValidUser: false,
+                emailMessage: "Email field Must be entered",
+            })
+            return false;
+        } else if (regex.test(this.state.email)) {
+            this.setState({
+                isValidUser: true
+            })
+            return true;
+        }else {
+            this.setState({
+                isValidUser: false,
+                emailMessage: "Not a valid email format"
+            })
+            return false;
+        }
+    }
+
+    execute_login_call= () => {
+        console.log(this.handle_Valid_Password())
+        if (this.handle_Valid_User() === false || this.handle_Valid_Password() === false) {
+            console.log("false")
+            return false;
+        }else {
+            console.log("now login")
+            this.login();
+        }
+    }
+
     render() {
         return (
             <View>
@@ -76,16 +127,25 @@ class LoginScreen extends Component {
                     placeholder="Enter email"
                     onChangeText={(email) => this.setState({ email })}
                     value={this.state.email}
+                    //onEndEditing={(e) => this.handleValidUser(e.nativeEvent.text)}
                 />
+                {this.state.isValidUser ? null :
+                    <Text style={styles.errorMsg}>{this.state.emailMessage}</Text>
+                } 
                 <TextInput
                     placeholder="Enter password"
                     onChangeText={(password) => this.setState({ password })}
                     value={this.state.password}
                     secureTextEntry={true}
+                    //onEndEditing={(e) => this.handleValidPassword(e.nativeEvent.text)}
                 />
+                {this.state.isValidPassword ? null :
+                    <Text style={styles.errorMsg}>{this.state.passwordMessage}</Text>
+                }
                 <Button
                     title="Login"
-                    onPress={() => this.login()}
+                    onPress={() => this.execute_login_call()}
+                    //disabled={this.state.password.length < 5}
                 />
                 <Button
                     title="Sign Up"
@@ -95,5 +155,11 @@ class LoginScreen extends Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    errorMsg: {
+        color: 'red'
+    }
+})
 
 export default LoginScreen;
