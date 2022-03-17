@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { SearchBar } from 'react-native-elements';
+import { SearchBar, ThemeConsumer } from 'react-native-elements';
 //import {SearchBar} from 'react-native-dynamic-search-bar';
 import { View, Text, StyleSheet, Image, Button, FlatList, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import PostScreen from './postscreen';
 import AddNewPost from './addnewpost';
 import UpdatePost from './updatepost';
+import { TextInput } from 'react-native-gesture-handler';
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -17,7 +18,13 @@ class HomeScreen extends Component {
             photo: [],
             isLoading: true,
             search:"",
-            posts: []
+            posts: [], 
+            disable: false,
+            n : 1,
+            deletePostMessage: "", 
+            updatePostMessage: "",
+            isValidUserDelete: true,
+            isValidUserUpdate: true,
         }
     }
 
@@ -33,8 +40,12 @@ class HomeScreen extends Component {
             await this.get_posts();
         });
         this.setState({
-            search: this.search,
-            isLoading: false
+            search:'',
+            isLoading: false,
+            disable: false,
+            isValidUserDelete: true,
+            isValidUserUpdate: true,
+            n : 1
         });
         console.log(this.state.photo);
     }
@@ -99,12 +110,6 @@ class HomeScreen extends Component {
                 console.error(error);
             });
     }
-
-    updateSearch = (text) => {
-        this.setState({
-            search: text
-        })
-    };
 
     get_posts = async () => {
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -191,18 +196,123 @@ class HomeScreen extends Component {
                 console.error(error);
             });
     }
-    
+
+    is_Valid_User = async (author_id) => {
+        let details = await AsyncStorage.getItem('@spacebook_details')
+        let parsed_details = JSON.parse(details)
+        let id = parsed_details.id
+        let token = parsed_details.token
+
+        console.log(this.state.n++ + '. is_Valid_User called')
+        if(id==author_id){
+            console.log('true id equals ' + id + ',author_id equals ' + author_id)
+            return true;
+        }
+        else{
+            console.log('false, id=' + id + ', author_id=' + author_id)
+            return false;
+        }
+    }
+
+    handle_delete = async (author_id) => {
+        console.log('handleDelete')
+        let details = await AsyncStorage.getItem('@spacebook_details')
+        let parsed_details = JSON.parse(details)
+        let id = parsed_details.id
+        let token = parsed_details.token
+        if(author_id == id){
+            this.setState({
+                isValidUserDelete: true,
+            })
+            console.log('isValidUserDelete ' + this.state.isValidUserDelete)
+            return true
+        }else{
+            this.setState({
+                isValidUserDelete: false,
+                deletePostMessage: 'cannot delete a post you dont own',
+            })
+            console.log('isValidUserDelete ' + this.state.isValidUserDelete)
+            return false
+        }
+    }
+
+    execute_delete_call = (post_id, author_id) => {
+        console.log('execute delete call')
+        this.handle_delete(author_id)
+            .then((response) => {
+                //console.log(response)
+                //return response
+                if (response == false) {
+                    console.log('isValidUserDelete ' + this.state.isValidUserDelete)
+                    return false;
+                } else {
+                    this.delete_post(post_id, author_id)
+                    //console.log('isValidUserDelete ' + this.state.isValidUserDelete)
+                    //console.log('call delete')
+                }
+            })
+        /* if(this.handle_delete(author_id) === false){
+            console.log('isValidUserDelete ' + this.state.isValidUserDelete)
+            return false;
+        }else{
+            //this.delete_post(post_id, author_id)
+            console.log('isValidUserDeler ' + this.state.isValidUserDelete)
+            console.log('call delete')
+        } */
+    }
+
+    handle_update = async (author_id) => {
+        console.log('handleDelete')
+        let details = await AsyncStorage.getItem('@spacebook_details')
+        let parsed_details = JSON.parse(details)
+        let id = parsed_details.id
+        let token = parsed_details.token
+        if (author_id == id) {
+            this.setState({
+                isValidUserUpdate: true,
+            })
+            console.log('isValidUserUpdate ' + this.state.isValidUserUpdate)
+            return true
+        } else {
+            this.setState({
+                isValidUserUpdate: false,
+                updatePostMessage: 'Can only update posts you have created',
+            })
+            console.log('isValidUserUpdate ' + this.state.isValidUserUpdate)
+            return false
+        }
+    }
+
+    execute_update_call = (author_id, item) => {
+        console.log('execute update call')
+        this.handle_update(author_id)
+            .then((response) => {
+                //console.log(response)
+                if (response == false) {
+                    console.log('isValidUserUpdate ' + this.state.isValidUserUpdate)
+                    return false;
+                } else {
+                    //this.delete_post(post_id, author_id)
+                    this.props.navigation.navigate('UpdatePost', item = { item })
+                }
+            })
+    }
+
     render() {
         if (!this.state.isLoading) {
             return (
                 <ScrollView>
-                    <View>
-                        <SearchBar
-                            placeholder="Search here"
-                            onChangeText={(text) => {
-                                this.updateSearch(text);
-                            }}
-                            value={this.search}
+                    <View style={styles.searchContainer}>
+                        <TextInput 
+                            placeholder='Search here...'
+                            onChangeText={(text) => this.setState({ search: text })}
+                            value={this.state.search}
+                            style={styles.search}
+                        />
+                        <Button
+                            title='Search'
+                            style={styles.searchButton}
+                            onPress={() => (this.props.navigation.navigate("SearchScreen", this.state.search=this.state.search))}
                         />
                     </View>
                     <View style={styles.container}>
@@ -211,8 +321,9 @@ class HomeScreen extends Component {
                                 uri: this.state.photo,
                             }}
                             style={{
-                                width: 400,
-                                height: 400,
+                                flex: 1,
+                                width: 250,
+                                height: 250,
                                 borderWidth: 5
                             }}
                         />
@@ -257,23 +368,31 @@ class HomeScreen extends Component {
                                         <Text style={styles.titleText}>Author Email: {JSON.stringify(item.author.email)}</Text>
                                         <Text style={styles.titleText}>Number Of Likes: {JSON.stringify(item.numLikes)}</Text>
                                     </View>
-                                    <Button 
-                                        title = "Delete Post"
-                                        onPress={() => (this.delete_post(JSON.stringify(item.post_id), JSON.stringify(item.author.user_id)))}
+                                    <Button
+                                        title="Delete Post"
+                                        onPress={() => (this.execute_delete_call(JSON.stringify(item.post_id), JSON.stringify(item.author.user_id)))}
                                     />
+                                    {this.state.isValidUserDelete ? null :
+                                        <Text style={styles.errorMsg}>{this.state.deletePostMessage}</Text>
+                                    }
                                     <Button
                                         title="Update Post"
-                                        onPress={() => this.props.navigation.navigate('UpdatePost', item = { item })}
+                                        //onPress={() => this.props.navigation.navigate('UpdatePost', item = { item })}
+                                        onPress={() => this.execute_update_call(JSON.stringify(item.author.user_id), item = { item })}
                                     />
+                                    {this.state.isValidUserUpdate ? null :
+                                        <Text style={styles.errorMsg}>{this.state.updatePostMessage}</Text>
+                                    }
                                     <Button
                                         title="View Post"
                                         onPress={() => this.props.navigation.navigate('ViewPost', item = { item })}
-                                        //onPress={() => (this.delete_post(JSON.stringify(item.post_id), JSON.stringify(item.author.user_id)))}
                                     />
                                 </View>
                             }
+                            
                         />
                     </View>
+                    
                 </ScrollView>
                 
             );
@@ -317,6 +436,24 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 20,
     },
+    searchContainer: {
+        flex: 1,
+        margin: 5,
+        marginLeft:5,
+        backgroundColor: '#fff',
+    },
+    search: {
+        flex: 0.5,
+        //width: 100,
+        height: 100
+    },
+    searchButton: {
+        flex: 0.5,
+        //width: 100,
+    },
+    errorMsg: {
+        color: 'red'
+    }
 });
 
 export default HomeScreen;
