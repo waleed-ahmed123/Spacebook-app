@@ -9,8 +9,11 @@ import PostScreens from './components/postscreen';
 import ViewPosts from './components/posts';
 import AddNewPostScreen from './components/addnewpost';
 import UpdatePostScreen from './components/updatepost';
+import UpdateFriendsPostScreen from './components/updatefriendspost';
 import ViewPostScreen from './components/viewpost';
 import AddNewFriendPostScreen from './components/addtofriendspost';
+import UsersFriends from './components/usersfriends';
+import SearchScreen from './components/searchscreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,8 +32,11 @@ class App extends Component {
           <Stack.Screen name="Post" component={ViewPosts} />
           <Stack.Screen name="AddNewPost" component={AddNewPostScreen} />
           <Stack.Screen name="UpdatePost" component={UpdatePostScreen} />
+          <Stack.Screen name="UpdateFriendsPost" component={UpdateFriendsPostScreen} />
           <Stack.Screen name="ViewPost" component={ViewPostScreen} />
           <Stack.Screen name="AddNewFriendPost" component={AddNewFriendPostScreen} />
+          <Stack.Screen name="UsersFriends" component={UsersFriends} />
+          <Stack.Screen name="SearchScreen" component={SearchScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     );
