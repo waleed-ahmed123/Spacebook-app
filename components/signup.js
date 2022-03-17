@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TextInput } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const storeData = async (value) => {
@@ -16,10 +16,18 @@ class SignUpScreen extends Component {
         super(props);
 
         this.state = {
-            first_name: "harry",
-            last_name: "harry",
-            email: "harry@gmail.com",
-            password: "harry123"
+            first_name: "joe",
+            last_name: "joe",
+            email: "joe@gmail.com",
+            password: "joe123",
+            firstNameMessage: "",
+            lastNameMessage: "",
+            emailMessage: "",
+            passwordMessage: "",
+            isValidFirstName: true,
+            isValidLastName: true,
+            isValidUser: true,
+            isValidPassword: true
         }; 
     }
 
@@ -59,6 +67,87 @@ class SignUpScreen extends Component {
             });
     }
 
+    handle_Valid_Password = () => {
+        console.log("handlePassword")
+        if (this.state.password.length > 4) {
+            this.setState({
+                isValidPassword: true
+            })
+            return true;
+        } else {
+            this.setState({
+                isValidPassword: false,
+                passwordMessage: "Password must be greater than 4 characters"
+            })
+            return false;
+        }
+    }
+
+    handle_Valid_User = () => {
+        console.log("handleUser")
+        const regex = /^([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$)$/;
+        if (!this.state.email.length > 0) {
+            this.setState({
+                isValidUser: false,
+                emailMessage: "Email field Must be entered",
+            })
+            return false;
+        } else if (regex.test(this.state.email)) {
+            this.setState({
+                isValidUser: true
+            })
+            return true;
+        } else {
+            this.setState({
+                isValidUser: false,
+                emailMessage: "Not a valid email format"
+            })
+            return false;
+        }
+    }
+
+    handle_Valid_First_Name = () => {
+        console.log('handleValidFirstName')
+        if (this.state.first_name.length > 0) {
+            this.setState({
+                isValidPassword: true
+            })
+            return true;
+        } else {
+            this.setState({
+                isValidFirstName: false,
+                firstNameMessage: "First Name Must Be Entered"
+            })
+            return false;
+        }
+    }
+
+    handle_Valid_Last_Name = () => {
+        console.log('handleValidLastName')
+        if (this.state.last_name.length > 0) {
+            this.setState({
+                isValidLastName: true
+            })
+            return true;
+        } else {
+            this.setState({
+                isValidLastName: false,
+                lastNameMessage: "Last Name Must Be Entered"
+            })
+            return false;
+        }
+    }
+
+    execute_signup_call = () => {
+        if (this.handle_Valid_First_Name() === false || this.handle_Valid_Last_Name() === false || this.handle_Valid_User() === false || this.handle_Valid_Password() === false) {
+            console.log("false")
+            return false;
+        } else {
+            console.log("User Signed Up")
+            this.SignUp();
+        }
+    }
+
     render() {
         return (
             <View>
@@ -68,29 +157,47 @@ class SignUpScreen extends Component {
                     onChangeText={(first_name) => this.setState({ first_name })}
                     value={this.state.first_name}
                 />
+                {this.state.isValidFirstName ? null :
+                    <Text style={styles.errorMsg}>{this.state.firstNameMessage}</Text>
+                }
                 <TextInput
                     placeholder="Enter Last Name"
                     onChangeText={(last_name) => this.setState({ last_name })}
                     value={this.state.last_name}
                 />
+                {this.state.isValidLastName ? null :
+                    <Text style={styles.errorMsg}>{this.state.lastNameMessage}</Text>
+                }
                 <TextInput
                     placeholder="Enter email"
                     onChangeText={(email) => this.setState({ email })}
                     value={this.state.email}
                 />
+                {this.state.isValidUser ? null :
+                    <Text style={styles.errorMsg}>{this.state.emailMessage}</Text>
+                }
                 <TextInput
                     placeholder="Enter password"
                     onChangeText={(password) => this.setState({ password })}
                     value={this.state.password}
                     secureTextEntry={true}
                 />
+                {this.state.isValidPassword ? null :
+                    <Text style={styles.errorMsg}>{this.state.passwordMessage}</Text>
+                }
                 <Button
                     title="Sign Up"
-                    onPress={() => this.SignUp()}
+                    onPress={() => this.execute_signup_call()}
                 />
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    errorMsg: {
+        color: 'red'
+    }
+})
 
 export default SignUpScreen;
