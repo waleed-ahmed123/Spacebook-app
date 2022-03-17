@@ -14,6 +14,14 @@ class UpdatePost extends Component {
         }
     }
 
+    async componentDidMount(route){
+        this.setState({
+            isLoading: false,
+        });
+        //console.log('User_id ' + this.props.route)
+        //console.log('User id ' + this.props.route.params.item)
+    }
+
     updatePost = async (author_id, post_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -59,17 +67,17 @@ class UpdatePost extends Component {
     }
 
     render() {
-        //console.log(this.post.post_id)
+        //console.log(this.props.route )
         return (
             <View>
                 <Text style={styles.titleText}>Update Post</Text>
-                <Text style={styles.titleText}>Post ID: {this.props.route.params.item.post_id}</Text>
-                <Text style={styles.titleText}>Text: {this.props.route.params.item.text}</Text>
-                <Text style={styles.titleText}>Author ID: {(this.props.route.params.item.author.user_id)}</Text>
-                <Text style={styles.titleText}>Author First Name: {(this.props.route.params.item.author.first_name)}</Text>
-                <Text style={styles.titleText}>Author Last Name: {(this.props.route.params.item.author.last_name)}</Text>
-                <Text style={styles.titleText}>Author Email: {(this.props.route.params.item.author.email)}</Text>
-                <Text style={styles.titleText}>Number Of Likes: {(this.props.route.params.item.numLikes)}</Text>
+                <Text style={styles.titleText}>Post ID: {this.props.route.params.item.item.post_id}</Text>
+                <Text style={styles.titleText}>Text: {this.props.route.params.item.item.text}</Text>
+                <Text style={styles.titleText}>Author ID: {(this.props.route.params.item.item.author.user_id)}</Text>
+                <Text style={styles.titleText}>Author First Name: {(this.props.route.params.item.item.author.first_name)}</Text>
+                <Text style={styles.titleText}>Author Last Name: {(this.props.route.params.item.item.author.last_name)}</Text>
+                <Text style={styles.titleText}>Author Email: {(this.props.route.params.item.item.author.email)}</Text>
+                <Text style={styles.titleText}>Number Of Likes: {(this.props.route.params.item.item.numLikes)}</Text>
                 <View style={styles.postContainer}>
                     <TextInput
                         placeholder="Enter Text"
@@ -79,14 +87,14 @@ class UpdatePost extends Component {
                     <View>
                         <Button
                             title="Submit"
-                            onPress={() => this.updatePost(JSON.stringify(this.props.route.params.item.author.user_id), JSON.stringify(this.props.route.params.item.post_id))}
+                            onPress={() => this.updatePost(JSON.stringify(this.props.route.params.item.item.author.user_id), JSON.stringify(this.props.route.params.item.item.post_id))}
                         />
                     </View>
                 </View>
                 <View>
                     <FlatList
                         style={styles.FLContainer} // FlatList Container
-                        data={this.props.route.params.item}
+                        data={this.props.route.params.item.item}
                         renderItem={({ item }) =>
                             <View style={styles.postContainer}>
                                 <View>
