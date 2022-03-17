@@ -14,7 +14,8 @@ class MyFriendsScreen extends Component {
         this.state = {
             post: [],
             details: [],
-            isLoading: true
+            isLoading: true,
+            photo: null
         }
     }
 
@@ -23,6 +24,40 @@ class MyFriendsScreen extends Component {
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_friends_list();
         });
+        this.setState({
+            //photo: this.get_profile_image(this.props.route.params.item.user_id)
+            photo: null
+        })
+        //console.log('route' + this.props.route.params)
+    }
+
+
+    get_profile_image = async (user_id) => {
+        let details = await AsyncStorage.getItem('@spacebook_details')
+        let parsed_details = JSON.parse(details)
+        let id = parsed_details.id
+        let token = parsed_details.token
+
+        console.log("here", id, token)
+        fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
+            method: 'GET',
+            headers: {
+                "X-Authorization": token,
+                "Content-Type": "image/jpeg"
+            }
+        })
+            .then((res) => {
+                return res.blob();
+            })
+            .then((resBlob) => {
+                let data = URL.createObjectURL(resBlob);
+                this.setState({
+                    photo: data
+                });
+            })
+            .catch((err) => {
+                console.log("error, something went wrong", err)
+            });
     }
 
     get_friends_list = async () => {
@@ -117,8 +152,6 @@ class MyFriendsScreen extends Component {
                 console.error(error);
             });
     }
-
-
     render() {
         if (this.state.isLoading) {
             return (<View><Text>loading </Text></View>)
@@ -137,11 +170,15 @@ class MyFriendsScreen extends Component {
                                 <Text style={styles.titleText}>Email: {JSON.stringify(item.user_email)}</Text>
                                 <Button
                                     title="View Post"
-                                    onPress={() => this.props.navigation.navigate('Post', item = { item })}
+                                    onPress={() => this.props.navigation.navigate('Post', item = { item, user_id: JSON.stringify(item.user_id) })}
                                 />
                                 <Button
                                     title="Add New Post"
                                     onPress={() => this.props.navigation.navigate('AddNewFriendPost', item = {item})}
+                                />
+                                <Button
+                                    title="Friends"
+                                    onPress={() => this.props.navigation.navigate('UsersFriends', item = { item, user_id: JSON.stringify(item.user_id)  })}
                                 />
                             </View>
                         }
