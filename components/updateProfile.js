@@ -126,10 +126,10 @@ class UpdateProfileScreen extends Component {
     }
 
     handleChoosePhoto = () => {
-        const options = {};
-        ImagePicker.launchImageLibrary(options, response =>{
-            console.log("response ", response);
-        })
+        const options = []
+        console.log(ImagePicker.launchImageLibrary(options, response => {
+            console.log('response ' + response)
+        }))
     };
 
     
@@ -146,7 +146,10 @@ class UpdateProfileScreen extends Component {
                     style={styles.imageContainer}
                 />
                 <View style={styles.uploadPhotoButton}>
-                    <Button title = "Upload Profile Photo" />
+                    <Button 
+                        title = "Upload Profile Photo" 
+                        //onPress = {() => this.handleChoosePhoto()}
+                    />
                 </View>
                 <View style={styles.container}>
                     <View style={styles.emailContainer}>
