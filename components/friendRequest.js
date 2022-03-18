@@ -12,12 +12,13 @@ class FriendRequestScreen extends Component {
     }
 
     async componentDidMount() {
-        //await this.get_friend_request_list();
+        // gets the friend requests each time the user loads this page. 
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_friend_request_list();
         });
     }
 
+    // friend request function. stores the results returned in details array
     get_friend_request_list = async () => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -27,14 +28,13 @@ class FriendRequestScreen extends Component {
             method: 'GET',
             headers: {
                 'X-Authorization': token,
-                //'Content-Type': 'application/json'
             }
         })
             .then((response) => {
                 if (response.status === 200) {
                     return response.json()
                         .then(async (json) => {
-                            console.log("Here Are Your Friends...")
+                            console.log("Here Are Your Friend requests...")
                             console.log(json);
                             this.setState({
                                 details: json,
@@ -44,14 +44,6 @@ class FriendRequestScreen extends Component {
                 }
                 if (response.status === 401) {
                     console.log("Unauthorised")
-                    //this.error = true;
-                }
-                if (response.status === 403) {
-                    console.log("Can only view the friends of yourself or your friends")
-                    //this.error = true;
-                }
-                if (response.status === 404) {
-                    console.log("Not found")
                     //this.error = true;
                 }
                 if (response.status === 500) {
@@ -64,6 +56,7 @@ class FriendRequestScreen extends Component {
             });
     }
 
+    // Accepting a friend request. if successful, it reloads the friend request list to update it on the screen
     acceptFriendRequest = async (friend_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -98,6 +91,7 @@ class FriendRequestScreen extends Component {
             });
     }
 
+    // rejecting a friend request. if successful, it reloads the friend request list to update it on the screen
     deleteFriendRequest = async (friend_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -152,11 +146,11 @@ class FriendRequestScreen extends Component {
                                 </View>
                                 <Button
                                     title = "Accept"
-                                    onPress = { () => this.acceptFriendRequest(JSON.stringify(item.user_id))}
+                                    onPress = { () => this.acceptFriendRequest(JSON.stringify(item.user_id))} // button to accept a friend request
                                 />
                                 <Button
                                     title="Reject"
-                                    onPress={() => this.deleteFriendRequest(JSON.stringify(item.user_id))}
+                                    onPress={() => this.deleteFriendRequest(JSON.stringify(item.user_id))} // button to reject a friend request
                                 />
                             </View>
                         }
