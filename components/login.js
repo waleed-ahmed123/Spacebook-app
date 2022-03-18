@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// function to store the user id and token once the user has logged in successfully.
 const storeData = async (value) => {
     try {
         const jsonValue = JSON.stringify(value)
@@ -27,14 +28,9 @@ class LoginScreen extends Component {
         };
     }
 
+    // login function - takes in the inputted email and password and makes an api call to login
+    //if successful, stores the user id and token in async storage, navigates to home page
     login = () => {
-
-        // 1. Check email is valid from this.state or state ... can use email validator libraries
-        // 2. Check the password is valid from this.state or state ... can use passord validator libraries
-
-        // 3. if email and password are both valid... do the function
-
-        //4. Else, display some error to the user
         fetch('http://localhost:3333/api/1.0.0/login', {
             method: 'POST',
             headers: {
@@ -69,6 +65,7 @@ class LoginScreen extends Component {
             });
     }
 
+    // Validation for password - password must be greater than 4 characters
     handle_Valid_Password = () => {
         console.log("handlePassword")
         if(this.state.password.length > 4){
@@ -85,6 +82,7 @@ class LoginScreen extends Component {
         }
     }
 
+    // Validation for email - it must be entered and in a valid email format
     handle_Valid_User = () => {
         console.log("handleUser")
         const regex = /^([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$)$/;
@@ -108,6 +106,8 @@ class LoginScreen extends Component {
         }
     }
 
+    // checks if the email and password validations return true, then executes the login function
+    // otherwise return false
     execute_login_call= () => {
         console.log(this.handle_Valid_Password())
         if (this.handle_Valid_User() === false || this.handle_Valid_Password() === false) {
@@ -127,9 +127,8 @@ class LoginScreen extends Component {
                     placeholder="Enter email"
                     onChangeText={(email) => this.setState({ email })}
                     value={this.state.email}
-                    //onEndEditing={(e) => this.handleValidUser(e.nativeEvent.text)}
                 />
-                {this.state.isValidUser ? null :
+                {this.state.isValidUser ? null : // displays the error message if email validation is false
                     <Text style={styles.errorMsg}>{this.state.emailMessage}</Text>
                 } 
                 <TextInput
@@ -137,15 +136,13 @@ class LoginScreen extends Component {
                     onChangeText={(password) => this.setState({ password })}
                     value={this.state.password}
                     secureTextEntry={true}
-                    //onEndEditing={(e) => this.handleValidPassword(e.nativeEvent.text)}
                 />
-                {this.state.isValidPassword ? null :
+                {this.state.isValidPassword ? null : // displays the error message if password validation is false
                     <Text style={styles.errorMsg}>{this.state.passwordMessage}</Text>
                 }
                 <Button
                     title="Login"
                     onPress={() => this.execute_login_call()}
-                    //disabled={this.state.password.length < 5}
                 />
                 <Button
                     title="Sign Up"
