@@ -25,7 +25,7 @@ class Post extends Component{
     }
 
     async componentDidMount() {
-        //this.get_posts(JSON.stringify(this.props.route.params.item.user_id))
+        // get posts of the friend by using the id in the route 
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_posts(JSON.stringify(this.props.route.params.item.user_id));
         });
@@ -41,6 +41,7 @@ class Post extends Component{
         console.log(this.state.posts)
     }
 
+    // get the posts of the friend and store the result in posts array
     get_posts = async (friend_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -88,6 +89,7 @@ class Post extends Component{
             });
     }
 
+    // get the profile image of the friend and store it in the photo variable 
     get_profile_image = async (user_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -116,6 +118,7 @@ class Post extends Component{
             });
     }
 
+    // function to like a post, then reload the posts to update the likes on the screen 
     like_Post = async (friend_id, post_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -153,6 +156,7 @@ class Post extends Component{
             });
     }
 
+    // function to unlike a post, then reload the posts to update the likes on the screen 
     unlike_Post = async (friend_id, post_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -167,7 +171,7 @@ class Post extends Component{
         })
             .then((response) => {
                 if (response.status === 200) {
-                    console.log("Post liked...")
+                    console.log("Post unliked...")
                     this.get_posts(friend_id)
                 }
                 if (response.status === 401) {
@@ -190,6 +194,7 @@ class Post extends Component{
             });
     }
 
+    // function to delete a post, then reload the posts to update the posts on the screen
     delete_post = async (post_id, user_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -229,22 +234,8 @@ class Post extends Component{
             });
     }
 
-    isValidUser = async (author_id) => {
-        let details = await AsyncStorage.getItem('@spacebook_details')
-        let parsed_details = JSON.parse(details)
-        let id = parsed_details.id
-        let token = parsed_details.token
-
-        if(id == author_id){
-            console.log("true")
-            return this.state.show;
-        }
-        else{
-            console.log('false')
-            return false;
-        }
-    }
-
+    // Validtion to check if the user trying to delete the post is the user who created the post
+    // if it is return true, else set an error message and return false
     handle_delete = async (author_id) => {
         console.log('handleDelete')
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -267,6 +258,7 @@ class Post extends Component{
         }
     }
 
+    // if the user is valid, delete the post, otherwise return false 
     execute_delete_call = (post_id, author_id) => {
         console.log('execute delete call')
         this.handle_delete(author_id)
@@ -278,20 +270,12 @@ class Post extends Component{
                     return false;
                 } else {
                     this.delete_post(post_id, this.props.route.params.item.user_id)
-                    //console.log('isValidUserDelete ' + this.state.isValidUserDelete)
-                    //console.log('call delete')
                 }
             })
-        /* if(this.handle_delete(author_id) === false){
-            console.log('isValidUserDelete ' + this.state.isValidUserDelete)
-            return false;
-        }else{
-            //this.delete_post(post_id, author_id)
-            console.log('isValidUserDeler ' + this.state.isValidUserDelete)
-            console.log('call delete')
-        } */
     }
 
+    // Validtion to check if the user trying to update the post is the user who created the post
+    // if it is return true, else set an error message and return false
     handle_update = async (author_id) => {
         console.log('handleDelete')
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -314,6 +298,7 @@ class Post extends Component{
         }
     }
 
+    // if the user is valid, navigate to the update friends post, and pass the post info and user id in the route
     execute_update_call = (author_id, item) => {
         console.log('execute update call')
         this.handle_update(author_id)
@@ -329,6 +314,8 @@ class Post extends Component{
             })
     }
 
+    // Validtion to check if the user trying to like the post isnt the user who created the post
+    // if it isnt return true, else set an error message and return false
     handle_like = async (friend_id) => {
         console.log('handleDelete')
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -351,6 +338,7 @@ class Post extends Component{
         }
     }
 
+    // if the user is valid, like the post, else return false
     execute_like_call = (friend_id, post_id) => {
         console.log('execute like call')
         this.handle_like(friend_id)
@@ -365,6 +353,8 @@ class Post extends Component{
             })
     }
 
+    // Validtion to check if the user trying to unlike the post isnt the user who created the post
+    // if it isnt return true, else set an error message and return false
     handle_unlike = async (friend_id) => {
         console.log('handleDelete')
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -387,6 +377,7 @@ class Post extends Component{
         }
     }
 
+    // if the user is valid, unlike the post, else return false
     execute_unlike_call = (friend_id, post_id) => {
         console.log('execute Unlike call')
         this.handle_unlike(friend_id)
@@ -438,31 +429,30 @@ class Post extends Component{
                                 </View>
                                 <Button 
                                     title = "Like"
-                                    onPress={() => this.execute_like_call(JSON.stringify(item.author.user_id), JSON.stringify(item.post_id))}
+                                    onPress={() => this.execute_like_call(JSON.stringify(item.author.user_id), JSON.stringify(item.post_id))} // button to like a post
                                 />
-                                {this.state.isValidUserLike ? null :
+                                {this.state.isValidUserLike ? null : // display error message for liking a post
                                     <Text style={styles.errorMsg}>{this.state.likePostMessage}</Text>
                                 }
                                 <Button
                                     title="Unlike"
-                                    onPress={() => this.execute_unlike_call(JSON.stringify(item.author.user_id), JSON.stringify(item.post_id))}
+                                    onPress={() => this.execute_unlike_call(JSON.stringify(item.author.user_id), JSON.stringify(item.post_id))} // button to unlike a post
                                 />
-                                {this.state.isValidUserUnlike ? null :
+                                {this.state.isValidUserUnlike ? null : // display error message for unliking a post
                                     <Text style={styles.errorMsg}>{this.state.unlikePostMessage}</Text>
                                 }
                                 <Button
                                     title="Delete Post"
-                                    onPress={() => (this.execute_delete_call(JSON.stringify(item.post_id), JSON.stringify(item.author.user_id)))}
+                                    onPress={() => (this.execute_delete_call(JSON.stringify(item.post_id), JSON.stringify(item.author.user_id)))} // button to delete a post
                                 />
-                                {this.state.isValidUserDelete ? null :
+                                {this.state.isValidUserDelete ? null : //display error message for unliking a post
                                     <Text style={styles.errorMsg}>{this.state.deletePostMessage}</Text>
                                 }
                                 <Button
                                     title="Update Post"
-                                    //onPress={() => this.props.navigation.navigate('UpdatePost', item = { item })}
-                                    onPress={() => this.execute_update_call(JSON.stringify(item.author.user_id), item = { item,  })}
+                                    onPress={() => this.execute_update_call(JSON.stringify(item.author.user_id), item = { item,  })} // button to update a post
                                 />
-                                {this.state.isValidUserUpdate ? null :
+                                {this.state.isValidUserUpdate ? null : // display error message for updating a post
                                     <Text style={styles.errorMsg}>{this.state.updatePostMessage}</Text>
                                 }
                                 
