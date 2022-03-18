@@ -14,6 +14,8 @@ class AddNewFriendPost extends Component {
         }
     }
 
+    //function to add a post to a friends user. sends a POST request by adding the text inputted by the user, in the header 
+    //then redirects back to the myfriends screen 
     addFriendsPost = async (friend_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -60,12 +62,14 @@ class AddNewFriendPost extends Component {
                 <Text style={styles.titleText}>Add New Post</Text>
                 <View style={styles.postContainer}>
                     <TextInput
+                        // text input to allow user to enter text to post
                         placeholder="Enter Text"
                         onChangeText={(text) => this.setState({ text })}
                         value={this.state.text}
                     />
                     <View>
                         <Button
+                            // button to add a post to a friends feed. It passes the user id from the route as a parameter
                             title="Submit"
                             onPress={() => this.addFriendsPost(JSON.stringify(this.props.route.params.item.user_id))}
                         />
