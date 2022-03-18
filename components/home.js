@@ -34,7 +34,7 @@ class HomeScreen extends Component {
         let id = parsed_details.id
         let token = parsed_details.token
         
-        //await this.get_posts();
+        // each time user loads this page, get the profile image and posts
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_profile_image(id);
             await this.get_posts();
@@ -50,6 +50,7 @@ class HomeScreen extends Component {
         console.log(this.state.photo);
     }
 
+    // profile image function - makes a call to the API, then sets the profile image to the photo state
     get_profile_image = async (user_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -58,8 +59,6 @@ class HomeScreen extends Component {
 
         console.log("here", id, token)
 
-        // let id = 8;
-        // let token = '7395cf6377fa0233063098a075bf2483';
         fetch("http://localhost:3333/api/1.0.0/user/" + user_id + "/photo", {
             method: 'GET',
             headers: {
@@ -81,6 +80,8 @@ class HomeScreen extends Component {
             });
     }
 
+    // makes a call to the logout functtion when user clicks on the button.
+    // directs the user to the login page
     logout = async () =>{
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -111,6 +112,7 @@ class HomeScreen extends Component {
             });
     }
 
+    // gets the posts of the logged in user and stores them in the posts array state
     get_posts = async () => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -157,7 +159,8 @@ class HomeScreen extends Component {
             });
     }
 
-
+    // deletes a post the logged in the user has created. 
+    // once deleted, calls the get posts function to update the posts on the screen
     delete_post = async(post_id, author_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -174,7 +177,6 @@ class HomeScreen extends Component {
                 if (response.status === 200) {
                     console.log("Post deleted...")
                     this.get_posts()
-                    //this.props.navigation.navigate("Login");
                 }
                 if (response.status === 401) {
                     console.log("Unauthorised")
@@ -197,23 +199,8 @@ class HomeScreen extends Component {
             });
     }
 
-    is_Valid_User = async (author_id) => {
-        let details = await AsyncStorage.getItem('@spacebook_details')
-        let parsed_details = JSON.parse(details)
-        let id = parsed_details.id
-        let token = parsed_details.token
-
-        console.log(this.state.n++ + '. is_Valid_User called')
-        if(id==author_id){
-            console.log('true id equals ' + id + ',author_id equals ' + author_id)
-            return true;
-        }
-        else{
-            console.log('false, id=' + id + ', author_id=' + author_id)
-            return false;
-        }
-    }
-
+    // Validation for deleting a post. Checks if the user deleting the post is the same as the author of the post
+    // if true, returns true. if false, sets an error message for the user. 
     handle_delete = async (author_id) => {
         console.log('handleDelete')
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -236,31 +223,23 @@ class HomeScreen extends Component {
         }
     }
 
+    // if the user is valid to delete, execute the delete post function
     execute_delete_call = (post_id, author_id) => {
         console.log('execute delete call')
         this.handle_delete(author_id)
             .then((response) => {
                 //console.log(response)
-                //return response
                 if (response == false) {
                     console.log('isValidUserDelete ' + this.state.isValidUserDelete)
                     return false;
                 } else {
                     this.delete_post(post_id, author_id)
-                    //console.log('isValidUserDelete ' + this.state.isValidUserDelete)
-                    //console.log('call delete')
                 }
             })
-        /* if(this.handle_delete(author_id) === false){
-            console.log('isValidUserDelete ' + this.state.isValidUserDelete)
-            return false;
-        }else{
-            //this.delete_post(post_id, author_id)
-            console.log('isValidUserDeler ' + this.state.isValidUserDelete)
-            console.log('call delete')
-        } */
     }
 
+    // Validation for updating a post. Checks if the user updating the post is the same as the author of the post
+    // if true, returns true. if false, sets an error message for the user.
     handle_update = async (author_id) => {
         console.log('handleDelete')
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -283,6 +262,7 @@ class HomeScreen extends Component {
         }
     }
 
+    // if the user is valid to update, navigate to the update post screen and pass the post information in the route as well
     execute_update_call = (author_id, item) => {
         console.log('execute update call')
         this.handle_update(author_id)
@@ -303,7 +283,7 @@ class HomeScreen extends Component {
             return (
                 <ScrollView>
                     <View style={styles.searchContainer}>
-                        <TextInput 
+                        <TextInput
                             placeholder='Search here...'
                             onChangeText={(text) => this.setState({ search: text })}
                             value={this.state.search}
@@ -312,6 +292,7 @@ class HomeScreen extends Component {
                         <Button
                             title='Search'
                             style={styles.searchButton}
+                            // when user clicks the search button, it navigates to the search screen and passes search state in the route.
                             onPress={() => (this.props.navigation.navigate("SearchScreen", this.state.search=this.state.search))}
                         />
                     </View>
@@ -354,7 +335,7 @@ class HomeScreen extends Component {
                         
                     </View>
                     <View>
-                        <FlatList
+                        <FlatList // use a flatlist to display information about posts
                             style = {styles.FLContainer} // FlatList Container
                             data={this.state.posts}
                             renderItem={({ item }) =>
@@ -372,7 +353,7 @@ class HomeScreen extends Component {
                                         title="Delete Post"
                                         onPress={() => (this.execute_delete_call(JSON.stringify(item.post_id), JSON.stringify(item.author.user_id)))}
                                     />
-                                    {this.state.isValidUserDelete ? null :
+                                    {this.state.isValidUserDelete ? null : // error message if user isnt allowed to delete
                                         <Text style={styles.errorMsg}>{this.state.deletePostMessage}</Text>
                                     }
                                     <Button
@@ -380,12 +361,12 @@ class HomeScreen extends Component {
                                         //onPress={() => this.props.navigation.navigate('UpdatePost', item = { item })}
                                         onPress={() => this.execute_update_call(JSON.stringify(item.author.user_id), item = { item })}
                                     />
-                                    {this.state.isValidUserUpdate ? null :
+                                    {this.state.isValidUserUpdate ? null : // error message if user isnt allowed to update
                                         <Text style={styles.errorMsg}>{this.state.updatePostMessage}</Text>
                                     }
                                     <Button
                                         title="View Post"
-                                        onPress={() => this.props.navigation.navigate('ViewPost', item = { item })}
+                                        onPress={() => this.props.navigation.navigate('ViewPost', item = { item })} // passes the posts info to the route as it directs to the view post screen
                                     />
                                 </View>
                             }
