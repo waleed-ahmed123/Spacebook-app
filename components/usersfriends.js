@@ -18,14 +18,16 @@ class UsersFriends extends Component{
 
     async componentDidMount() {
         this.setState({
+            //sets the user_id to the id passed through the route
             user_id: this.props.route.params.item.user_id
         })
+        //each time this page loads, is gets the friends of the friend 
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_users_friends(this.state.user_id);
         });
-        //console.log('route ' + this.props.route.params.item.user_id)
     }
 
+    //gets a users friends by passing their user id, then sets the returned data to the friends array
     get_users_friends = async (user_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -80,7 +82,7 @@ class UsersFriends extends Component{
             return (
                 <ScrollView>
                     <FlatList
-                        style={styles.FLContainer} // FlatList Container
+                        style={styles.FLContainer} // display the friends as a flatlist
                         data={this.state.friends}
                         renderItem={({ item }) =>
                             <View style={styles.userContainer}>
