@@ -14,6 +14,8 @@ class AddNewPost extends Component{
         }
     }
 
+    //function to add a new post. Makes a POST request by taking the text inputted by the user 
+    //then navigates back to the home screen.
     addPost = async () => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -52,50 +54,13 @@ class AddNewPost extends Component{
             });
     }
 
-    addFriendsPost = async (friend_id) => {
-        let details = await AsyncStorage.getItem('@spacebook_details')
-        let parsed_details = JSON.parse(details)
-        let id = parsed_details.id
-        let token = parsed_details.token
-        fetch('http://localhost:3333/api/1.0.0/user/' + friend_id + '/post', {
-            method: 'POST',
-            headers: {
-                'X-Authorization': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                text: this.state.text
-            })
-        })
-            .then((response) => {
-                if (response.status === 201) {
-                    console.log("Created new post...")
-                    console.log("Now go home...")
-                    this.props.navigation.navigate("MyFriends");
-                }
-                if (response.status === 401) {
-                    console.log("Unauthorised")
-                }
-                if (response.status === 404) {
-                    console.log("Not found")
-                    //this.error = true;
-                }
-                if (response.status === 500) {
-                    console.log("server error");
-                }
-            })
-
-            .catch((error) => {
-                console.error(error);
-            });
-    }
-
    render() {
        return(
            <View>
                <Text style = {styles.titleText}>Add New Post</Text>
                <View style = {styles.postContainer}>
                     <TextInput
+                        // text input to allow user to post something
                         placeholder="Enter Text"
                         onChangeText={(text) => this.setState({ text })}
                         value={this.state.text}
@@ -103,7 +68,7 @@ class AddNewPost extends Component{
                     <View>
                         <Button
                             title = "Submit"
-                            onPress = {() => this.addPost()}
+                            onPress = {() => this.addPost()} // add post button
                         />
                     </View>
                </View>
