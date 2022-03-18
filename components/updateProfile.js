@@ -24,15 +24,19 @@ class UpdateProfileScreen extends Component {
         let parsed_details = JSON.parse(details);
         let id = parsed_details.id;
         let token = parsed_details.token;
+        //display the image of the user each time the screen loads
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_profile_image(id);
         });
         this.setState({
+            // set the photo to the profile image of the user
             photo: this.get_profile_image(id),
             isLoading: false
         });
     }
 
+    //Function to get the image of a user. 
+    //sets the image to the returned data
     get_profile_image = async (user_id) => {
         // Get these from AsyncStorage
         let details = await AsyncStorage.getItem('@spacebook_details')
@@ -68,6 +72,7 @@ class UpdateProfileScreen extends Component {
             });
     }
 
+    //Function to update a users information. send a POST request, then navigates back the home screen
     updateInfo = async () => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details);
@@ -147,6 +152,7 @@ class UpdateProfileScreen extends Component {
                     <View style={styles.emailContainer}>
                         <Text>Update First Name </Text>
                         <TextInput
+                            //Sets the inputted text to the first name state 
                             placeholder="Enter First Name"
                             onChangeText={(first_name) => this.setState({ first_name })}
                             value={this.state.first_name}
@@ -155,6 +161,7 @@ class UpdateProfileScreen extends Component {
                     <View style={styles.emailContainer}>
                         <Text>Update Last Name </Text>
                         <TextInput
+                            //Sets the inputted text to the last name state 
                             placeholder="Enter Last Name"
                             onChangeText={(last_name) => this.setState({ last_name })}
                             value={this.state.last_name}
@@ -163,6 +170,7 @@ class UpdateProfileScreen extends Component {
                     <View style={styles.emailContainer}>
                         <Text>Update Email </Text>
                         <TextInput
+                            //Sets the inputted text to the email state 
                             placeholder="Enter email"
                             onChangeText={(email) => this.setState({ email })}
                             value={this.state.email}
@@ -171,6 +179,7 @@ class UpdateProfileScreen extends Component {
                     <View style={styles.emailContainer}> 
                         <Text>Update Password </Text>
                         <TextInput
+                            //Sets the inputted text to the password state 
                             placeholder="Enter password"
                             onChangeText={(password) => this.setState({ password })}
                             value={this.state.password}
@@ -179,6 +188,7 @@ class UpdateProfileScreen extends Component {
                     </View>
                 </View>
                 <Button
+                    // button to allow a user to update a profile information
                     title="Update"
                     onPress={() => (this.updateInfo())}
                 />
