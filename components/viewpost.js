@@ -2,6 +2,8 @@ import { Component } from "react";
 import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+//This screen is to show the user a post that they have created.
+//Does this by getting the parameters passed through the route. 
 class ViewPost extends Component{
     constructor(props) {
         super(props);
@@ -25,26 +27,6 @@ class ViewPost extends Component{
                 <Text style={styles.titleText}>Author Last Name: {(this.props.route.params.item.author.last_name)}</Text>
                 <Text style={styles.titleText}>Author Email: {(this.props.route.params.item.author.email)}</Text>
                 <Text style={styles.titleText}>Number Of Likes: {(this.props.route.params.item.numLikes)}</Text>
-                <View>
-                    <FlatList
-                        style={styles.FLContainer} // FlatList Container
-                        data={this.props.route.params.item}
-                        renderItem={({ item }) =>
-                            <View style={styles.postContainer}>
-                                <View>
-                                    <Text style={styles.titleText}>Post ID: {item.post_id}</Text>
-                                    <Text style={styles.titleText}>Text: {(item.text)}</Text>
-                                    <Text style={styles.titleText}>Author ID: {(item.author.user_id)}</Text>
-                                    <Text style={styles.titleText}>Author First Name: {(item.author.first_name)}</Text>
-                                    <Text style={styles.titleText}>Author Last Name: {(item.author.last_name)}</Text>
-                                    <Text style={styles.titleText}>Author Email: {(item.author.email)}</Text>
-                                    <Text style={styles.titleText}>Number Of Likes: {(item.numLikes)}</Text>
-                                </View>
-                            </View>
-                        }
-                    />
-                </View>
-
             </View>
         )
     }
