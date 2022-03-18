@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// function to store the user id and token once the user has logged in successfully.
 const storeData = async (value) => {
     try {
         const jsonValue = JSON.stringify(value)
@@ -31,6 +32,7 @@ class SignUpScreen extends Component {
         }; 
     }
 
+    // Sign up function - makes an API call to user with the inputted first name, last name, email, password
     SignUp = () => {
         fetch('http://localhost:3333/api/1.0.0/user', {
             method: 'POST',
@@ -67,6 +69,7 @@ class SignUpScreen extends Component {
             });
     }
 
+    // Validation for password - password must be greater than 4 characters
     handle_Valid_Password = () => {
         console.log("handlePassword")
         if (this.state.password.length > 4) {
@@ -83,6 +86,7 @@ class SignUpScreen extends Component {
         }
     }
 
+    // Validation for email - it must be entered and in a valid email format
     handle_Valid_User = () => {
         console.log("handleUser")
         const regex = /^([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$)$/;
@@ -106,6 +110,7 @@ class SignUpScreen extends Component {
         }
     }
 
+    // Validation for first name - it must be entered
     handle_Valid_First_Name = () => {
         console.log('handleValidFirstName')
         if (this.state.first_name.length > 0) {
@@ -122,6 +127,7 @@ class SignUpScreen extends Component {
         }
     }
 
+    // Validation for last name - it must be entered
     handle_Valid_Last_Name = () => {
         console.log('handleValidLastName')
         if (this.state.last_name.length > 0) {
@@ -138,6 +144,7 @@ class SignUpScreen extends Component {
         }
     }
 
+    // checks if all the validations return true and then executes the sign up function
     execute_signup_call = () => {
         if (this.handle_Valid_First_Name() === false || this.handle_Valid_Last_Name() === false || this.handle_Valid_User() === false || this.handle_Valid_Password() === false) {
             console.log("false")
@@ -157,7 +164,7 @@ class SignUpScreen extends Component {
                     onChangeText={(first_name) => this.setState({ first_name })}
                     value={this.state.first_name}
                 />
-                {this.state.isValidFirstName ? null :
+                {this.state.isValidFirstName ? null : // displays the error message if first name validation is false
                     <Text style={styles.errorMsg}>{this.state.firstNameMessage}</Text>
                 }
                 <TextInput
@@ -165,7 +172,7 @@ class SignUpScreen extends Component {
                     onChangeText={(last_name) => this.setState({ last_name })}
                     value={this.state.last_name}
                 />
-                {this.state.isValidLastName ? null :
+                {this.state.isValidLastName ? null : // displays the error message if last name validation is false
                     <Text style={styles.errorMsg}>{this.state.lastNameMessage}</Text>
                 }
                 <TextInput
@@ -173,7 +180,7 @@ class SignUpScreen extends Component {
                     onChangeText={(email) => this.setState({ email })}
                     value={this.state.email}
                 />
-                {this.state.isValidUser ? null :
+                {this.state.isValidUser ? null : // displays the error message if email validation is false
                     <Text style={styles.errorMsg}>{this.state.emailMessage}</Text>
                 }
                 <TextInput
@@ -182,7 +189,7 @@ class SignUpScreen extends Component {
                     value={this.state.password}
                     secureTextEntry={true}
                 />
-                {this.state.isValidPassword ? null :
+                {this.state.isValidPassword ? null : // displays the error message if password validation is false
                     <Text style={styles.errorMsg}>{this.state.passwordMessage}</Text>
                 }
                 <Button
