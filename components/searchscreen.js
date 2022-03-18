@@ -176,14 +176,22 @@ class SearchScreen extends Component{
         let id = parsed_details.id
         let token = parsed_details.token
 
-        if (this.state.myFriends.some(myfriend => myfriend.user_id == user_id)) {
+        if (user_id == id) {
+            this.setState({
+                isFriend: true,
+                isFriendMessage: 'cannot add yourself as friend',
+            })
+            console.log('isFriend ' + this.state.isFriend)
+            return true
+        } else if (this.state.myFriends.some(myfriend => myfriend.user_id == user_id )) {
             this.setState({
                 isFriend: true,
                 isFriendMessage: 'User already added as friend',
             })
             console.log('isFriend ' + this.state.isFriend)
             return true
-        } else {
+        } 
+        else {
             this.setState({
                 isFriend: false,
             })
