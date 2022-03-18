@@ -18,6 +18,8 @@ class UpdateFriendsPost extends Component {
         console.log(this.props.route.params.user_id)
     }
 
+    //function for updating a post on your friends feed. takes in the text inputted and makes a call to update
+    //then navigates back to the myfriends screen
     updatePost = async (author_id, post_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -36,7 +38,7 @@ class UpdateFriendsPost extends Component {
             .then((response) => {
                 if (response.status === 200) {
                     console.log("Updated post...")
-                    console.log("Now go home...")
+                    console.log("Now go to myfriends...")
                     this.props.navigation.navigate("MyFriends");
                 }
                 if (response.status === 400) {
@@ -50,7 +52,6 @@ class UpdateFriendsPost extends Component {
                 }
                 if (response.status === 404) {
                     console.log("Not found")
-                    //this.error = true;
                 }
                 if (response.status === 500) {
                     console.log("server error");
@@ -82,6 +83,7 @@ class UpdateFriendsPost extends Component {
                     />
                     <View>
                         <Button
+                            //Button to update a post. Sends a call to the function by passing the user id and post id, from the route
                             title="Submit"
                             onPress={() => this.updatePost(JSON.stringify(this.props.route.params.user_id), JSON.stringify(this.props.route.params.item.item.post_id))}
                         />
