@@ -18,17 +18,22 @@ class SearchScreen extends Component{
     }
 
     async componentDidMount(){
+        // set the query to the parameter sent to the route
         this.setState({
             query: this.props.route.params,
             isLoading: true,
         })
+        // get the users friends list each time the page is loaded/reloaded
         this.unsubscribe = this.props.navigation.addListener('focus', async () => {
             await this.get_my_friends_list()
         });
+        // when user loads the page, search for the user by passing the query the user has searched for
         await this.search_friends(this.state.query)
         
     }
 
+    // search for user function - searches the users using the query. 
+    // sets the returned value to users array 
     search_friends = async (query) => {
     let details = await AsyncStorage.getItem('@spacebook_details')
     let parsed_details = JSON.parse(details)
@@ -72,6 +77,7 @@ class SearchScreen extends Component{
         });
     }
 
+    // add user function 
     add_new_friend = async (user_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -113,6 +119,8 @@ class SearchScreen extends Component{
             });
     }
 
+    // gets the friends of a user to check if the user youre trying to add isnt already your friend
+    // sets the results in myfriends array
     get_my_friends_list = async () => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -159,14 +167,15 @@ class SearchScreen extends Component{
             });
     }
 
+    // Validation for adding a user - checks if the user adding isnt already in the myfriends array.
+    // if they are, returns true and sets an error message. If not, returns false
     handle_add_friend = async (user_id) => {
         console.log('handleAddFriend')
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
         let id = parsed_details.id
         let token = parsed_details.token
-        //console.log(this.state.myFriends.includes(user_id))
-        //console.log(this.state.myFriends.some(myfriend => myfriend.user_id == 10))
+
         if (this.state.myFriends.some(myfriend => myfriend.user_id == user_id)) {
             this.setState({
                 isFriend: true,
@@ -183,6 +192,7 @@ class SearchScreen extends Component{
         }
     }
 
+    // if the validation returns false, adds the user.
     execute_add_friend_call = (user_id, post_id) => {
         console.log('execute add friend call')
         this.handle_add_friend(user_id)
@@ -219,7 +229,7 @@ class SearchScreen extends Component{
                                     title="Add Friend"
                                     onPress={() => this.execute_add_friend_call(JSON.stringify(item.user_id))}
                                 />
-                                {!this.state.isFriend ? null :
+                                {!this.state.isFriend ? null : // sets an error message if the user is already a friend
                                     <Text style={styles.errorMsg}>{this.state.isFriendMessage}</Text>
                                 }
                             </View>
