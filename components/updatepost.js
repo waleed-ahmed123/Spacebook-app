@@ -18,10 +18,10 @@ class UpdatePost extends Component {
         this.setState({
             isLoading: false,
         });
-        //console.log('User_id ' + this.props.route)
-        //console.log('User id ' + this.props.route.params.item)
     }
 
+    //function to updating a post on the users feed. takes the text inputted and updates the post
+    //then redirects back to the home screen 
     updatePost = async (author_id, post_id) => {
         let details = await AsyncStorage.getItem('@spacebook_details')
         let parsed_details = JSON.parse(details)
@@ -86,31 +86,12 @@ class UpdatePost extends Component {
                     />
                     <View>
                         <Button
+                        //Button to update a post. Sends a call to the function by passing the user id and post id, from the route
                             title="Submit"
                             onPress={() => this.updatePost(JSON.stringify(this.props.route.params.item.item.author.user_id), JSON.stringify(this.props.route.params.item.item.post_id))}
                         />
                     </View>
                 </View>
-                <View>
-                    <FlatList
-                        style={styles.FLContainer} // FlatList Container
-                        data={this.props.route.params.item.item}
-                        renderItem={({ item }) =>
-                            <View style={styles.postContainer}>
-                                <View>
-                                    <Text style={styles.titleText}>Post ID: {item.post_id}</Text>
-                                    <Text style={styles.titleText}>Text: {(item.text)}</Text>
-                                    <Text style={styles.titleText}>Author ID: {(item.author.user_id)}</Text>
-                                    <Text style={styles.titleText}>Author First Name: {(item.author.first_name)}</Text>
-                                    <Text style={styles.titleText}>Author Last Name: {(item.author.last_name)}</Text>
-                                    <Text style={styles.titleText}>Author Email: {(item.author.email)}</Text>
-                                    <Text style={styles.titleText}>Number Of Likes: {(item.numLikes)}</Text>
-                                </View>
-                            </View>
-                        }
-                    />
-                </View>
-
             </View>
         )
     }
